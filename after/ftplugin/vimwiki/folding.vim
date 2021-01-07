@@ -96,16 +96,20 @@ endfunction
 
 function! s:FoldText()
   let level = HeadingDepth(v:foldstart)
-  let indent = repeat('#', level)
+
+  let level_sym = '*'
+  if  level == 2
+    let level_sym = '>'
+  elseif level > 2
+    let level_sym = '-'
+  endif
+  " let indent = repeat('#', level) . repeat(' ', level)
+  let indent = repeat(' ', 3 * (level - 1)) . level_sym
+  s:header_level = s:header_level + 1
+  " let indent = repeat('#', level)
   let title = substitute(getline(v:foldstart), '^#\+\s\+', '', '')
   let foldsize = (v:foldend - v:foldstart)
   let linecount = '['.foldsize.' line'.(foldsize>1?'s':'').']'
-
-  if level < 6
-    let spaces_1 = repeat(' ', 6 - level)
-  else
-    let spaces_1 = ' '
-  endif
 
   if exists('*strdisplaywidth')
       let title_width = strdisplaywidth(title)
@@ -113,13 +117,13 @@ function! s:FoldText()
       let title_width = len(title)
   endif
 
-  if title_width < 40
-    let spaces_2 = repeat(' ', 40 - title_width)
+  if title_width < 80
+    let spaces_2 = repeat('.', 80 - title_width - 3 * (level -1))
   else
     let spaces_2 = ' '
   endif
 
-  return indent.spaces_1.title.spaces_2.linecount
+  return " ".indent.' '.title.spaces_2.linecount
 endfunction
 
 " API {{{1
